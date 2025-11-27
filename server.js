@@ -103,23 +103,29 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // Pour les fichiers PHP, on retourne une erreur car ils doivent être servis par PHP-FPM
-    if (pathname.endsWith('.php')) {
-        res.writeHead(503, { 'Content-Type': 'text/plain' });
-        res.end('PHP files must be served by a PHP server (Apache/Nginx with PHP-FPM)');
+    // Pour les fichiers PHP et la racine, on retourne une erreur car ils doivent être servis par PHP-FPM
+    if (pathname.endsWith('.php') || pathname === '/') {
+        res.writeHead(503, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Service non disponible</title>
+                <meta charset="utf-8">
+            </head>
+            <body>
+                <h1>Service non disponible</h1>
+                <p>Les fichiers PHP doivent être servis par un serveur PHP (Apache/Nginx avec PHP-FPM).</p>
+                <p>Ce serveur Node.js gère uniquement les WebSockets sur <code>/ws</code> et les fichiers statiques (CSS, JS, images).</p>
+                <p>Veuillez configurer Coolify pour utiliser un service PHP pour les fichiers <code>.php</code>.</p>
+            </body>
+            </html>
+        `);
         return;
     }
-
-    // Servir les fichiers statiques
-    let filePath = path.join(__dirname, pathname === '/' ? 'home.php' : pathname);
     
-    // Si c'est la racine, essayer home.php puis index.html
-    if (pathname === '/') {
-        filePath = path.join(__dirname, 'home.php');
-        if (!fs.existsSync(filePath)) {
-            filePath = path.join(__dirname, 'index.html');
-        }
-    }
+    // Servir uniquement les fichiers statiques (CSS, JS, images, etc.)
+    let filePath = path.join(__dirname, pathname);
 
     // Vérifier si le fichier existe
     fs.stat(filePath, (err, stats) => {

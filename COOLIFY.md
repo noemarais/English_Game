@@ -1,60 +1,80 @@
 # Configuration Coolify - English Game
 
-## ⚠️ PROBLÈME RÉSOLU : "Upgrade Required"
+## ⚠️ PROBLÈME : Téléchargement de fichiers au lieu d'affichage
 
-Le problème "Upgrade Required" vient du fait que Coolify essaie de servir les fichiers PHP via le serveur WebSocket. 
+Si vous voyez un fichier "téléchargement" se télécharger au lieu d'afficher votre site, c'est parce que **Coolify essaie de servir les fichiers PHP via le serveur Node.js**.
 
-**Solution** : Utilisez le nouveau fichier `server.js` qui gère à la fois HTTP et WebSocket.
+**Solution** : Vous devez créer **DEUX services** dans Coolify.
 
 ---
 
 ## Configuration dans Coolify
 
-### Installation (Install Command)
+### Service 1 : Node.js (WebSocket UNIQUEMENT)
+
+#### Installation (Install Command)
 ```bash
 npm install
 ```
 
-### Build (Build Command)
+#### Build (Build Command)
 ```bash
 # Laissez vide
 ```
 
-### Run (Start Command)
+#### Run (Start Command)
 ```bash
 npm start
 ```
 
-## Variables d'environnement
-
+#### Variables d'environnement
 - `PORT`: Port pour le serveur (Coolify définit automatiquement cette variable, généralement 3025)
 
-## Configuration du reverse proxy
+**Ce service gère UNIQUEMENT les WebSockets sur `/ws`**
 
-Dans Coolify, vous devez configurer le reverse proxy pour :
+---
 
-1. **Routes `/ws`** → Service Node.js (pour les WebSockets)
-2. **Routes `*.php`** → Service PHP (si vous avez un service PHP séparé)
-3. **Autres fichiers statiques** → Service Node.js
+### Service 2 : PHP (fichiers PHP + fichiers statiques)
 
-### Option recommandée : Service PHP séparé
-
-Pour une meilleure performance, créez **DEUX services** dans Coolify :
-
-#### Service 1 : Node.js (WebSocket + fichiers statiques)
-- **Install**: `npm install`
-- **Start**: `npm start`
-- Gère les WebSockets sur `/ws` et les fichiers statiques (CSS, JS, images)
-
-#### Service 2 : PHP (fichiers PHP)
+#### Type de service
 - **Type**: PHP
-- **Version**: PHP 8.1+
-- Gère tous les fichiers `.php`
+- **Version PHP**: 8.1 ou supérieur
 
-Configurez le reverse proxy pour router :
-- `/ws` → Service Node.js
-- `*.php` → Service PHP
-- Autres → Service Node.js
+#### Installation (Install Command)
+```bash
+# Laissez vide
+```
+
+#### Build (Build Command)
+```bash
+# Laissez vide
+```
+
+#### Run (Start Command)
+```bash
+# Laissez vide (Coolify gère automatiquement PHP-FPM)
+```
+
+**Ce service gère TOUS les fichiers PHP et les fichiers statiques (CSS, JS, images)**
+
+---
+
+## Configuration du reverse proxy dans Coolify
+
+Dans les paramètres de votre application Coolify, configurez le reverse proxy pour :
+
+1. **Routes `/ws`** → Service Node.js (port 3025 ou celui défini)
+2. **Toutes les autres routes** → Service PHP
+
+### Configuration recommandée
+
+- **Point d'entrée principal** : Service PHP
+- **Route spéciale `/ws`** : Service Node.js
+
+Cela garantit que :
+- Les fichiers PHP sont exécutés par PHP-FPM
+- Les fichiers statiques sont servis par Nginx/Apache
+- Les WebSockets sont gérés par Node.js
 
 ---
 
