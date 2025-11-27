@@ -1,0 +1,189 @@
+
+
+:root {
+    --primary-color: #5176E7;
+    --primary-color2: #9ADBE1;
+    --secondary-color: #CB6CE6;
+    --secondary-color2: #B268C5; 
+}
+
+h1{
+    font-family: 'Baloo 2', cursive;
+
+}
+
+.login_page{
+    height: 100svh;
+    background-color: var(--primary-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    .header_login{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .titrelogin{
+            font-size: 20vw;
+            text-align: center;
+            width: 100%;
+            margin: 0;
+        }
+        img{
+        
+        }
+    }
+    
+    .button_login{
+        display: flex;
+        flex-direction: column;
+        gap: 2vh;
+        text-align: center;
+        margin-bottom: 20px;
+        button{
+            font-family: 'Baloo 2';
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 45px;
+            width: 75vw;
+            cursor: pointer;
+            font-size: 5rem;
+        }
+        .insc{
+            background-color: var(--secondary-color2);
+        }
+    }
+    .container_insc{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 75vw;
+        display: none;
+        div{
+            display: flex;
+            align-items: center;
+            gap: 10vw;
+            img{
+                width: 4vh;
+                height: 4vh;
+                cursor: pointer;
+            }
+            h2{
+                font-family: 'Baloo 2';
+                font-size: 4rem;
+                margin: 0;
+            }
+        }
+        form{
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+            margin-top: 5vh;
+            input{
+                font-size: 3rem;
+                padding: 1vh;
+                border-radius: 10px;
+                border: none;
+            }
+            button{
+                font-family: 'Baloo 2';
+                background-color: var(--secondary-color);
+                color: white;
+                border: none;
+                border-radius: 45px;
+                width: 50vw;
+                cursor: pointer;
+                font-size: 4rem;
+                margin-top: 2vh;
+            }
+        }
+    }   
+    .container_connect{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 75vw;
+        display: none;
+        div{
+            display: flex;
+            align-items: center;
+            gap: 10vw;
+            img{
+                width: 4vh;
+                height: 4vh;
+                cursor: pointer;
+            }
+            h2{
+                font-family: 'Baloo 2';
+                font-size: 4rem;
+                margin: 0;
+            }
+        }
+        form{
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+            margin-top: 5vh;
+            input{
+                font-size: 3rem;
+                padding: 1vh;
+                border-radius: 10px;
+                border: none;
+            }
+            button{
+                font-family: 'Baloo 2';
+                background-color: var(--secondary-color);
+                color: white;
+                border: none;
+                border-radius: 45px;
+                width: 50vw;
+                cursor: pointer;
+                font-size: 4rem;
+                margin-top: 2vh;
+            }
+        }
+    }   
+    .msg{
+        font-family: 'Montserrat', sans-serif;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: red;
+        font-size: 2rem;
+        margin-top: 2vh;
+    }
+}
+
+.home_page{
+    nav{
+        margin-top: 5vh;
+        height: 30vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        p{
+            width: 90%;
+            font-size: 2rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        div{
+            width: 90%;
+            display: flex;
+            justify-content: space-between;
+            img{
+                width: 4vh;
+                height: 4vh;
+                cursor: pointer;
+            }
+            h2{
+                font-family: 'Baloo 2';
+                font-size: 4rem;
+                margin: 0;
+            }
+        }
+    }
+}

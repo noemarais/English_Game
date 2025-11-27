@@ -1,0 +1,547 @@
+:root {
+    --primary-color: #5176E7;
+    --primary-color2: #9ADBE1;
+    --secondary-color: #CB6CE6;
+    --secondary-color2: #B268C5;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #FFFFFF;
+    color: #111111;
+}
+
+.title-font {
+    font-family: 'Baloo 2', cursive;
+}
+
+.text-font {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 24px 18px 110px;
+    position: relative;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.header-text-small {
+    font-size: 14px;
+    color: #777777;
+    margin-bottom: 4px;
+}
+
+.header-name {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.avatar-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid #000;
+}
+
+/* Amis */
+.friends-wrapper {
+    margin-bottom: 26px;
+}
+
+.friends-slider {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+}
+
+.friends-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.friend-card {
+    min-width: 190px;
+    background: #FFFFFF;
+    border-radius: 22px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    border: 1px solid #E7E7E7;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.friend-banner {
+    height: 90px;
+    background: var(--primary-color);
+}
+
+.friend-content {
+    padding: 10px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.friend-name {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.friend-actions-row {
+    display: flex;
+    gap: 8px;
+}
+
+.friend-profile-btn,
+.friend-invite-btn {
+    flex: 1;
+    border-radius: 999px;
+    border: none;
+    padding: 7px 0;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.friend-profile-btn {
+    background: #ffffff;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.friend-invite-btn {
+    background: var(--secondary-color);
+    color: #FFFFFF;
+}
+
+/* Bouton ajouter ami */
+.add-friend-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px 0;
+    border-radius: 18px;
+    background: var(--primary-color);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Demandes d'amis */
+.pending-box {
+    margin-top: 20px;
+    background: #F4F4F4;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.pending-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.pending-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.pending-name {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.pending-actions button {
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.accept-btn {
+    background: #4CAF50;
+    color: white;
+    margin-right: 6px;
+}
+
+.decline-btn {
+    background: #E74C3C;
+    color: white;
+}
+
+/* Bloc central créer / rejoindre */
+.game-actions {
+    margin-bottom: 26px;
+}
+
+.game-actions-card {
+    background: var(--secondary-color);
+    border-radius: 28px;
+    height: 180px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 10px;
+    color: #FFFFFF;
+}
+
+.game-actions-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.game-actions-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-pill {
+    flex: 1;
+    border-radius: 999px;
+    border: none;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-create {
+    background: #FFFFFF;
+    color: var(--secondary-color);
+}
+
+.btn-join {
+    background: rgba(255, 255, 255, 0.16);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Parties récentes */
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.recent-section {
+    margin-bottom: 40px;
+}
+
+.no-games-text {
+    font-size: 14px;
+    color: #777;
+    margin-top: 4px;
+}
+
+.recent-card {
+    display: flex;
+    align-items: stretch;
+    border-radius: 22px;
+    border: 1px solid #E7E7E7;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    margin-bottom: 14px;
+}
+
+.recent-visual {
+    width: 80px;
+    background: var(--primary-color);
+    position: relative;
+}
+
+.recent-bubbles {
+    position: absolute;
+    bottom: -10px;
+    left: 4px;
+    display: flex;
+    gap: 6px;
+}
+
+.bubble {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color2);
+}
+
+.bubble:nth-child(2) {
+    background: var(--secondary-color);
+}
+
+.bubble:nth-child(3) {
+    background: var(--secondary-color2);
+}
+
+.bubble:nth-child(4) {
+    background: #283B8F;
+}
+
+.recent-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    gap: 10px;
+}
+
+.recent-date {
+    font-size: 15px;
+}
+
+.recent-rank {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #E0E0E0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.recent-rank small {
+    font-size: 11px;
+    font-weight: 400;
+}
+
+/* Nav ronde en bas */
+.bottom-nav-wrapper {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+}
+
+.nav-wheel {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    box-shadow: 0 7px 24px rgba(0, 0, 0, 0.22);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.nav-arrow {
+    position: absolute;
+    top: 20px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    transform: rotate(140deg);
+}
+
+.nav-home-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 2px solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-home-icon::before {
+    content: "";
+    width: 16px;
+    height: 14px;
+    border-radius: 4px 4px 2px 2px;
+    border: 2px solid #FFFFFF;
+    border-top: none;
+    position: relative;
+    top: 2px;
+}
+
+.nav-wheel.rotating {
+    animation: wheel-rotate 0.55s ease-in-out forwards;
+}
+
+@keyframes wheel-rotate {
+    from {
+        transform: translateX(-50%) rotate(0deg);
+    }
+    to {
+        transform: translateX(-50%) rotate(360deg);
+    }
+}
+
+/* Modal ajout ami */
+.modal-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-box {
+    background: #fff;
+    width: 80%;
+    max-width: 350px;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.modal-submit {
+    background: var(--secondary-color);
+    border: none;
+    padding: 10px 0;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Montserrat';
+}
+
+.modal-cancel {
+    background: #ccc;
+    border: none;
+    padding: 10px 0;
+    border-radius: 12px;
+    color: black;
+    cursor: pointer;
+}
+
+.modal-error {
+    color: red;
+    font-size: 14px;
+}
+
+.modal-success {
+    color: green;
+    font-size: 14px;
+}
+
+.avatar-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar-circle img.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.game-invites {
+    margin-top: 20px;
+    background: #F4F4FF;
+    padding: 14px;
+    border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.game-invites-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.game-invite-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 10px 12px;
+    border: 1px solid #E0E0FF;
+    margin-bottom: 10px;
+}
+
+.game-invite-main {
+    margin-bottom: 8px;
+}
+
+.game-invite-host {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.game-invite-name {
+    font-size: 13px;
+    color: #555;
+}
+
+.game-invite-code {
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.game-invite-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.game-invite-actions form {
+    flex: 1;
+}
+
+.game-invite-accept,
+.game-invite-decline {
+    width: 100%;
+    border-radius: 999px;
+    border: none;
+    padding: 8px 0;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.game-invite-accept {
+    background: var(--primary-color);
+    color: #FFFFFF;
+}
+
+.game-invite-decline {
+    background: #E0E0E0;
+    color: #333333;
+}

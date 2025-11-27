@@ -1,0 +1,389 @@
+:root {
+    --primary-color: #5176E7;
+    --primary-color2: #9ADBE1;
+    --secondary-color: #CB6CE6;
+    --secondary-color2: #B268C5;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.game-page {
+    font-family: 'Montserrat', sans-serif;
+    background: #F5F6FB;
+    color: #111;
+}
+
+.title-font {
+    font-family: 'Baloo 2', cursive;
+}
+
+.text-font {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.game-container {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 20px 18px 30px;
+}
+
+/* Header */
+.game-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.game-header h1 {
+    font-size: 22px;
+}
+
+.game-back-btn {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    color: #5176E7;
+}
+
+/* Form */
+.game-form {
+    background: #FFFFFF;
+    padding: 18px 16px;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.game-form label {
+    font-size: 14px;
+}
+
+.game-form input[type="text"],
+.game-form input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #D0D0D0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+}
+
+.btn-primary {
+    margin-top: 8px;
+    width: 100%;
+    padding: 11px 0;
+    border-radius: 999px;
+    border: none;
+    background: var(--primary-color);
+    color: #FFFFFF;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* Messages */
+.game-error {
+    margin-bottom: 10px;
+    color: #E74C3C;
+}
+
+.game-success {
+    margin-bottom: 10px;
+    color: #2D8A4B;
+}
+
+/* Card lobby */
+.game-card {
+    background: #FFFFFF;
+    padding: 18px 16px 20px;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.game-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.game-name {
+    font-size: 20px;
+}
+
+.game-sub-info {
+    font-size: 13px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.game-status {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+.game-status-open {
+    background: #EAF4FF;
+    color: #2C6FD9;
+}
+
+.game-status-in_progress {
+    background: #FFF4E5;
+    color: #D9822C;
+}
+
+.game-status-finished {
+    background: #EAF8ED;
+    color: #2D8A4B;
+}
+
+/* Code bloc */
+.game-code-block {
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+.game-code-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.game-code {
+    font-size: 20px;
+    letter-spacing: 0.2em;
+    background: #F0F2FF;
+    padding: 8px 12px;
+    border-radius: 12px;
+}
+
+.copy-code-btn {
+    border-radius: 999px;
+    border: none;
+    background: var(--secondary-color);
+    color: #FFFFFF;
+    padding: 8px 10px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* Players */
+.game-players h3 {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.game-players ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.game-players li {
+    padding: 6px 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.host-tag {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #FFEFD0;
+    color: #D9822C;
+}
+
+/* Actions lobby */
+.game-actions-lobby {
+    margin-top: 16px;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 10px 0;
+    border-radius: 999px;
+    border: none;
+    background: #CCCCCC;
+    color: #555555;
+    cursor: not-allowed;
+}
+
+/* Invite amis */
+.lobby-invite-box {
+    margin-top: 18px;
+    padding-top: 10px;
+    border-top: 1px solid #EEE;
+}
+
+.lobby-invite-box h3 {
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.lobby-invite-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+}
+
+.inline-form {
+    margin: 0;
+}
+
+.lobby-add-btn {
+    border-radius: 999px;
+    border: none;
+    background: var(--primary-color2);
+    color: #ffffff;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.lobby-full-text {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* Bloc timer et saisie des points */
+
+.timer-block {
+    margin-bottom: 18px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    background: #F0F3FF;
+}
+
+.timer-label {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.timer-display {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.timer-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.round-form h3 {
+    margin-bottom: 10px;
+}
+
+.round-players-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.round-player-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.round-player-name {
+    font-size: 14px;
+}
+
+.round-player-total {
+    font-size: 11px;
+    color: #777;
+    margin-left: 4px;
+}
+
+.round-input {
+    width: 90px;
+    padding: 7px 8px;
+    border-radius: 12px;
+    border: 1px solid #D0D0D0;
+    text-align: center;
+}
+
+.round-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+/* Bouton secondaire déjà utilisé, on renforce un peu le style */
+.btn-secondary {
+    width: 100%;
+    padding: 10px 0;
+    border-radius: 999px;
+    border: none;
+    background: #CCCCCC;
+    color: #555555;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Fin de partie */
+.endgame-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.endgame-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: #F7F7FF;
+}
+
+.endgame-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.endgame-rank {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--primary-color);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.endgame-name {
+    font-size: 14px;
+}
+
+.endgame-right {
+    text-align: right;
+    font-size: 13px;
+}
+
+.endgame-roundwins {
+    font-size: 11px;
+    color: #666;
+}
