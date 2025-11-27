@@ -1,16 +1,19 @@
 # Configuration Coolify - English Game
 
-## ⚠️ PROBLÈME : Téléchargement de fichiers au lieu d'affichage
+## ✅ Solution tout-en-un automatique
 
-Si vous voyez un fichier "téléchargement" se télécharger au lieu d'afficher votre site, c'est parce que **Coolify essaie de servir les fichiers PHP via le serveur Node.js**.
+Le serveur gère **automatiquement** :
+- ✅ Fichiers PHP (exécutés via PHP CLI)
+- ✅ Fichiers statiques (CSS, JS, images)
+- ✅ WebSockets sur `/ws`
 
-**Solution** : Vous devez créer **DEUX services** dans Coolify.
+**Un seul service Node.js suffit !**
 
 ---
 
 ## Configuration dans Coolify
 
-### Service 1 : Node.js (WebSocket UNIQUEMENT)
+### Service Node.js (tout-en-un)
 
 #### Installation (Install Command)
 ```bash
@@ -29,42 +32,48 @@ npm start
 
 #### Variables d'environnement
 - `PORT`: Port pour le serveur (Coolify définit automatiquement cette variable, généralement 3025)
+- `PHP_PATH`: (Optionnel) Chemin vers PHP si ce n'est pas dans le PATH. Par défaut: `php`
 
-**Ce service gère UNIQUEMENT les WebSockets sur `/ws`**
-
----
-
-### Service 2 : PHP (fichiers PHP + fichiers statiques)
-
-#### Type de service
-- **Type**: PHP
-- **Version PHP**: 8.1 ou supérieur
-
-#### Installation (Install Command)
-```bash
-# Laissez vide
-```
-
-#### Build (Build Command)
-```bash
-# Laissez vide
-```
-
-#### Run (Start Command)
-```bash
-# Laissez vide (Coolify gère automatiquement PHP-FPM)
-```
-
-**Ce service gère TOUS les fichiers PHP et les fichiers statiques (CSS, JS, images)**
+**Note** : Assurez-vous que PHP est installé dans le conteneur Coolify. Si ce n'est pas le cas, ajoutez PHP dans les dépendances ou utilisez une image Docker avec PHP.
 
 ---
 
-## Configuration du reverse proxy dans Coolify
+## Installation de PHP dans Coolify
 
-Dans les paramètres de votre application Coolify, configurez le reverse proxy pour :
+Si PHP n'est pas disponible dans votre conteneur Node.js, vous pouvez :
 
-1. **Routes `/ws`** → Service Node.js (port 3025 ou celui défini)
-2. **Toutes les autres routes** → Service PHP
+### Option 1 : Utiliser une image Docker personnalisée
+
+Créez un `Dockerfile` :
+```dockerfile
+FROM node:18
+
+# Installer PHP
+RUN apt-get update && apt-get install -y php php-cli && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+CMD ["npm", "start"]
+```
+
+### Option 2 : Installer PHP via les commandes de build
+
+Dans Coolify, ajoutez dans **Build Command** :
+```bash
+apt-get update && apt-get install -y php php-cli && npm install
+```
+
+---
+
+## Fonctionnalités
+
+- ✅ **Fichiers PHP** : Exécutés automatiquement via PHP CLI
+- ✅ **Fichiers statiques** : CSS, JS, images servis directement
+- ✅ **WebSockets** : Disponibles sur `/ws`
+- ✅ **Tout automatique** : Un seul service, tout fonctionne !
 
 ### Configuration recommandée
 

@@ -1,13 +1,13 @@
-// server.js - Serveur HTTP avec support WebSocket
+// server.js - Serveur HTTP complet avec PHP, fichiers statiques et WebSocket
 const http = require('http');
-const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const { spawn } = require('child_process');
 const WebSocket = require('ws');
 
 const PORT = process.env.PORT || 3025;
-const IS_HTTPS = process.env.HTTPS === 'true';
+const PHP_PATH = process.env.PHP_PATH || 'php'; // Chemin vers PHP (par défaut 'php' dans le PATH)
 
 // gameId -> Set<ws>
 const games = new Map();
@@ -88,44 +88,112 @@ function serveStaticFile(req, res, filePath) {
     });
 }
 
+// Fonction pour exécuter un fichier PHP
+function executePHP(req, res, filePath) {
+    // Récupérer les variables d'environnement pour PHP
+    const env = {
+        ...process.env,
+        REQUEST_METHOD: req.method,
+        REQUEST_URI: req.url,
+        QUERY_STRING: url.parse(req.url, true).query ? 
+            new URLSearchParams(url.parse(req.url, true).query).toString() : '',
+        HTTP_HOST: req.headers.host || 'localhost',
+        SERVER_NAME: req.headers.host || 'localhost',
+        SERVER_PORT: PORT,
+        SCRIPT_NAME: req.url,
+        SCRIPT_FILENAME: filePath,
+        PATH_INFO: url.parse(req.url).pathname,
+    };
+
+    // Ajouter les headers HTTP comme variables d'environnement
+    Object.keys(req.headers).forEach(key => {
+        const envKey = 'HTTP_' + key.toUpperCase().replace(/-/g, '_');
+        env[envKey] = req.headers[key];
+    });
+
+    // Pour les requêtes POST, récupérer le body
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    req.on('end', () => {
+        // Ajouter le body comme stdin pour PHP
+        const phpProcess = spawn(PHP_PATH, ['-f', filePath], {
+            env: env,
+            cwd: path.dirname(filePath)
+        });
+
+        let output = '';
+        let errorOutput = '';
+
+        phpProcess.stdout.on('data', (data) => {
+            output += data.toString();
+        });
+
+        phpProcess.stderr.on('data', (data) => {
+            errorOutput += data.toString();
+        });
+
+        phpProcess.on('close', (code) => {
+            if (code !== 0) {
+                console.error('Erreur PHP:', errorOutput);
+                res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+                res.end(`<h1>Erreur PHP</h1><pre>${errorOutput}</pre>`);
+                return;
+            }
+
+            // Parser la sortie PHP pour extraire les headers et le body
+            const parts = output.split('\r\n\r\n');
+            if (parts.length >= 2) {
+                const headersPart = parts[0];
+                const bodyPart = parts.slice(1).join('\r\n\r\n');
+                
+                const headers = {};
+                headersPart.split('\r\n').forEach(line => {
+                    const colonIndex = line.indexOf(':');
+                    if (colonIndex > 0) {
+                        const key = line.substring(0, colonIndex).trim();
+                        const value = line.substring(colonIndex + 1).trim();
+                        headers[key] = value;
+                    }
+                });
+
+                res.writeHead(200, headers);
+                res.end(bodyPart);
+            } else {
+                // Pas de headers, juste le body
+                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                res.end(output);
+            }
+        });
+
+        // Envoyer le body POST à PHP via stdin si nécessaire
+        if (body && req.method === 'POST') {
+            phpProcess.stdin.write(body);
+            phpProcess.stdin.end();
+        }
+    });
+}
+
 // Création du serveur HTTP
 const server = http.createServer((req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const pathname = parsedUrl.pathname;
 
-    // Route WebSocket - retourne 426 Upgrade Required pour forcer l'upgrade
+    // Route WebSocket - sera gérée par le serveur WebSocket
     if (pathname === '/ws') {
-        res.writeHead(426, {
-            'Upgrade': 'websocket',
-            'Connection': 'Upgrade'
-        });
-        res.end('WebSocket upgrade required');
+        // Le serveur WebSocket gérera cette route
         return;
     }
 
-    // Pour les fichiers PHP et la racine, on retourne une erreur car ils doivent être servis par PHP-FPM
-    if (pathname.endsWith('.php') || pathname === '/') {
-        res.writeHead(503, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Service non disponible</title>
-                <meta charset="utf-8">
-            </head>
-            <body>
-                <h1>Service non disponible</h1>
-                <p>Les fichiers PHP doivent être servis par un serveur PHP (Apache/Nginx avec PHP-FPM).</p>
-                <p>Ce serveur Node.js gère uniquement les WebSockets sur <code>/ws</code> et les fichiers statiques (CSS, JS, images).</p>
-                <p>Veuillez configurer Coolify pour utiliser un service PHP pour les fichiers <code>.php</code>.</p>
-            </body>
-            </html>
-        `);
-        return;
+    // Déterminer le chemin du fichier
+    let filePath;
+    if (pathname === '/') {
+        filePath = path.join(__dirname, 'home.php');
+    } else {
+        filePath = path.join(__dirname, pathname);
     }
-    
-    // Servir uniquement les fichiers statiques (CSS, JS, images, etc.)
-    let filePath = path.join(__dirname, pathname);
 
     // Vérifier si le fichier existe
     fs.stat(filePath, (err, stats) => {
@@ -135,7 +203,13 @@ const server = http.createServer((req, res) => {
             return;
         }
 
-        serveStaticFile(req, res, filePath);
+        // Si c'est un fichier PHP, l'exécuter
+        if (filePath.endsWith('.php')) {
+            executePHP(req, res, filePath);
+        } else {
+            // Sinon, servir comme fichier statique
+            serveStaticFile(req, res, filePath);
+        }
     });
 });
 
@@ -238,7 +312,8 @@ wss.on('connection', (ws, req) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Serveur HTTP/WebSocket démarré sur le port ${PORT}`);
-    console.log(`WebSocket disponible sur ws://localhost:${PORT}/ws`);
+    console.log(`✅ Serveur complet démarré sur le port ${PORT}`);
+    console.log(`📄 Fichiers PHP: http://localhost:${PORT}/`);
+    console.log(`🔌 WebSocket: ws://localhost:${PORT}/ws`);
+    console.log(`📦 Fichiers statiques: http://localhost:${PORT}/[fichier]`);
 });
-
