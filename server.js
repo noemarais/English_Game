@@ -156,6 +156,46 @@ function executePHP(req, res, filePath) {
             errorOutput += data.toString();
         });
 
+        // Gérer l'erreur si PHP n'est pas installé
+        phpProcess.on('error', (err) => {
+            if (err.code === 'ENOENT') {
+                console.error('❌ PHP n\'est pas installé !');
+                console.error('💡 Installez PHP dans votre conteneur Coolify.');
+                console.error('   Option 1: Utilisez le Dockerfile fourni');
+                console.error('   Option 2: Ajoutez dans Build Command: apt-get update && apt-get install -y php php-cli php-mysql');
+                res.writeHead(503, { 'Content-Type': 'text/html; charset=utf-8' });
+                res.end(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>PHP non installé</title>
+                        <meta charset="utf-8">
+                        <style>
+                            body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+                            code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>❌ PHP n'est pas installé</h1>
+                        <p>PHP doit être installé dans votre conteneur Coolify pour exécuter les fichiers PHP.</p>
+                        <h2>Solutions :</h2>
+                        <h3>Option 1 : Utiliser le Dockerfile (Recommandé)</h3>
+                        <p>Dans Coolify, configurez votre service pour utiliser le <code>Dockerfile</code> fourni.</p>
+                        <h3>Option 2 : Installer PHP via Build Command</h3>
+                        <p>Dans Coolify, ajoutez dans <strong>Build Command</strong> :</p>
+                        <pre><code>apt-get update && apt-get install -y php php-cli php-mysql php-mbstring php-xml php-curl && npm install</code></pre>
+                        <h3>Option 3 : Utiliser une image Docker avec PHP</h3>
+                        <p>Utilisez une image de base qui contient déjà PHP et Node.js.</p>
+                    </body>
+                    </html>
+                `);
+                return;
+            }
+            console.error('Erreur lors de l\'exécution de PHP:', err);
+            res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+            res.end(`<h1>Erreur serveur</h1><p>${err.message}</p>`);
+        });
+
         phpProcess.on('close', (code) => {
             if (code !== 0) {
                 console.error('Erreur PHP:', errorOutput);

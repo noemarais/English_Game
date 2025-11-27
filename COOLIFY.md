@@ -40,24 +40,37 @@ npm start
 
 ## Installation de PHP dans Coolify
 
+### ⚠️ IMPORTANT : PHP doit être installé
+
+Si vous voyez l'erreur `spawn php ENOENT`, PHP n'est pas installé dans votre conteneur.
+
 ### Option 1 : Utiliser le Dockerfile (RECOMMANDÉ)
 
 Un `Dockerfile` est fourni qui installe automatiquement PHP et Node.js.
 
 Dans Coolify :
-- **Type de build** : Dockerfile
-- Le Dockerfile sera utilisé automatiquement
+1. Allez dans les paramètres de votre service
+2. **Type de build** : Sélectionnez "Dockerfile"
+3. Le Dockerfile sera détecté automatiquement
+4. Redéployez votre service
 
-### Option 2 : Installer PHP via les commandes de build
+### Option 2 : Installer PHP via Build Command
 
-Si vous n'utilisez pas le Dockerfile, dans Coolify, ajoutez dans **Build Command** :
+Si vous n'utilisez pas le Dockerfile, dans Coolify :
+
+1. Allez dans les paramètres de votre service
+2. Dans **Build Command**, remplacez par :
 ```bash
-apt-get update && apt-get install -y php php-cli php-mysql php-mbstring && npm install
+apt-get update && apt-get install -y php php-cli php-mysql php-mbstring php-xml php-curl && npm install
 ```
 
-### Option 3 : Utiliser une image de base avec PHP
+**Important** : Assurez-vous que votre image de base supporte `apt-get` (images basées sur Debian/Ubuntu).
 
-Dans Coolify, vous pouvez aussi utiliser une image Docker personnalisée qui contient déjà PHP et Node.js.
+### Option 3 : Utiliser une image Docker personnalisée
+
+Dans Coolify, vous pouvez spécifier une image Docker personnalisée qui contient déjà PHP et Node.js, par exemple :
+- `php:8.1-cli` + installation de Node.js
+- Ou une image personnalisée que vous créez
 
 ---
 
