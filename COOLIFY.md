@@ -1,6 +1,14 @@
 # Configuration Coolify - English Game
 
-## Commandes pour Coolify
+## ⚠️ PROBLÈME RÉSOLU : "Upgrade Required"
+
+Le problème "Upgrade Required" vient du fait que Coolify essaie de servir les fichiers PHP via le serveur WebSocket. 
+
+**Solution** : Utilisez le nouveau fichier `server.js` qui gère à la fois HTTP et WebSocket.
+
+---
+
+## Configuration dans Coolify
 
 ### Installation (Install Command)
 ```bash
@@ -9,38 +17,50 @@ npm install
 
 ### Build (Build Command)
 ```bash
-# Laissez vide ou ne définissez pas de commande build
-# Ce projet n'a pas besoin de build
+# Laissez vide
 ```
 
 ### Run (Start Command)
 ```bash
 npm start
 ```
-ou
-```bash
-node ws-server.js
-```
-
-## Configuration dans l'interface Coolify
-
-Dans votre application Coolify, configurez :
-
-1. **Install Command**: `npm install`
-2. **Build Command**: (laissez vide)
-3. **Start Command**: `npm start` ou `node ws-server.js`
 
 ## Variables d'environnement
 
-Ajoutez dans Coolify :
-- `PORT`: Port pour le serveur WebSocket (défaut: 3025)
-  - Le serveur démarre sur le port 3025 par défaut
-  - Vous pouvez définir `PORT=3025` dans Coolify pour être explicite
+- `PORT`: Port pour le serveur (Coolify définit automatiquement cette variable, généralement 3025)
+
+## Configuration du reverse proxy
+
+Dans Coolify, vous devez configurer le reverse proxy pour :
+
+1. **Routes `/ws`** → Service Node.js (pour les WebSockets)
+2. **Routes `*.php`** → Service PHP (si vous avez un service PHP séparé)
+3. **Autres fichiers statiques** → Service Node.js
+
+### Option recommandée : Service PHP séparé
+
+Pour une meilleure performance, créez **DEUX services** dans Coolify :
+
+#### Service 1 : Node.js (WebSocket + fichiers statiques)
+- **Install**: `npm install`
+- **Start**: `npm start`
+- Gère les WebSockets sur `/ws` et les fichiers statiques (CSS, JS, images)
+
+#### Service 2 : PHP (fichiers PHP)
+- **Type**: PHP
+- **Version**: PHP 8.1+
+- Gère tous les fichiers `.php`
+
+Configurez le reverse proxy pour router :
+- `/ws` → Service Node.js
+- `*.php` → Service PHP
+- Autres → Service Node.js
+
+---
 
 ## Notes importantes
 
-- Le serveur WebSocket écoute sur le port défini par la variable d'environnement `PORT` ou 3025 par défaut
-- Les fichiers PHP nécessitent un serveur web séparé (Apache/Nginx) avec PHP-FPM
-- La base de données MySQL doit être configurée dans `db.php` avec les bonnes variables d'environnement
-- Assurez-vous que le dossier de travail (Working Directory) dans Coolify pointe vers le dossier contenant `package.json` et `ws-server.js`
-
+- Le serveur WebSocket écoute sur `/ws` (pas besoin de spécifier le port dans l'URL)
+- Les fichiers PHP doivent être servis par un serveur PHP (Apache/Nginx avec PHP-FPM)
+- La base de données MySQL doit être configurée dans `db.php`
+- Le nouveau `server.js` remplace `ws-server.js` et gère à la fois HTTP et WebSocket
