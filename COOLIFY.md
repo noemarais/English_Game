@@ -40,31 +40,24 @@ npm start
 
 ## Installation de PHP dans Coolify
 
-Si PHP n'est pas disponible dans votre conteneur Node.js, vous pouvez :
+### Option 1 : Utiliser le Dockerfile (RECOMMANDÉ)
 
-### Option 1 : Utiliser une image Docker personnalisée
+Un `Dockerfile` est fourni qui installe automatiquement PHP et Node.js.
 
-Créez un `Dockerfile` :
-```dockerfile
-FROM node:18
-
-# Installer PHP
-RUN apt-get update && apt-get install -y php php-cli && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-
-CMD ["npm", "start"]
-```
+Dans Coolify :
+- **Type de build** : Dockerfile
+- Le Dockerfile sera utilisé automatiquement
 
 ### Option 2 : Installer PHP via les commandes de build
 
-Dans Coolify, ajoutez dans **Build Command** :
+Si vous n'utilisez pas le Dockerfile, dans Coolify, ajoutez dans **Build Command** :
 ```bash
-apt-get update && apt-get install -y php php-cli && npm install
+apt-get update && apt-get install -y php php-cli php-mysql php-mbstring && npm install
 ```
+
+### Option 3 : Utiliser une image de base avec PHP
+
+Dans Coolify, vous pouvez aussi utiliser une image Docker personnalisée qui contient déjà PHP et Node.js.
 
 ---
 

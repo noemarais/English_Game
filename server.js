@@ -90,38 +90,59 @@ function serveStaticFile(req, res, filePath) {
 
 // Fonction pour exécuter un fichier PHP
 function executePHP(req, res, filePath) {
+    const parsedUrl = url.parse(req.url, true);
+    const queryString = parsedUrl.query ? new URLSearchParams(parsedUrl.query).toString() : '';
+    
+    // Récupérer les cookies de la requête
+    const cookies = req.headers.cookie || '';
+    
     // Récupérer les variables d'environnement pour PHP
     const env = {
         ...process.env,
         REQUEST_METHOD: req.method,
         REQUEST_URI: req.url,
-        QUERY_STRING: url.parse(req.url, true).query ? 
-            new URLSearchParams(url.parse(req.url, true).query).toString() : '',
+        QUERY_STRING: queryString,
         HTTP_HOST: req.headers.host || 'localhost',
-        SERVER_NAME: req.headers.host || 'localhost',
-        SERVER_PORT: PORT,
-        SCRIPT_NAME: req.url,
+        SERVER_NAME: req.headers.host ? req.headers.host.split(':')[0] : 'localhost',
+        SERVER_PORT: PORT.toString(),
+        SCRIPT_NAME: parsedUrl.pathname,
         SCRIPT_FILENAME: filePath,
-        PATH_INFO: url.parse(req.url).pathname,
+        PATH_INFO: parsedUrl.pathname,
+        PATH_TRANSLATED: filePath,
+        DOCUMENT_ROOT: __dirname,
+        SERVER_PROTOCOL: 'HTTP/1.1',
+        GATEWAY_INTERFACE: 'CGI/1.1',
+        CONTENT_TYPE: req.headers['content-type'] || '',
+        CONTENT_LENGTH: req.headers['content-length'] || '0',
+        HTTP_COOKIE: cookies,
+        HTTP_USER_AGENT: req.headers['user-agent'] || '',
+        HTTP_ACCEPT: req.headers.accept || '*/*',
+        HTTP_ACCEPT_LANGUAGE: req.headers['accept-language'] || '',
+        HTTP_ACCEPT_ENCODING: req.headers['accept-encoding'] || '',
+        HTTP_CONNECTION: req.headers.connection || 'keep-alive',
+        HTTP_REFERER: req.headers.referer || '',
     };
 
-    // Ajouter les headers HTTP comme variables d'environnement
+    // Ajouter tous les autres headers HTTP comme variables d'environnement
     Object.keys(req.headers).forEach(key => {
-        const envKey = 'HTTP_' + key.toUpperCase().replace(/-/g, '_');
-        env[envKey] = req.headers[key];
+        if (!env['HTTP_' + key.toUpperCase().replace(/-/g, '_')]) {
+            const envKey = 'HTTP_' + key.toUpperCase().replace(/-/g, '_');
+            env[envKey] = req.headers[key];
+        }
     });
 
-    // Pour les requêtes POST, récupérer le body
+    // Pour les requêtes POST/PUT, récupérer le body
     let body = '';
     req.on('data', chunk => {
         body += chunk.toString();
     });
 
     req.on('end', () => {
-        // Ajouter le body comme stdin pour PHP
+        // Exécuter PHP avec les bonnes options
         const phpProcess = spawn(PHP_PATH, ['-f', filePath], {
             env: env,
-            cwd: path.dirname(filePath)
+            cwd: __dirname,
+            stdio: ['pipe', 'pipe', 'pipe']
         });
 
         let output = '';
@@ -144,33 +165,61 @@ function executePHP(req, res, filePath) {
             }
 
             // Parser la sortie PHP pour extraire les headers et le body
-            const parts = output.split('\r\n\r\n');
-            if (parts.length >= 2) {
-                const headersPart = parts[0];
-                const bodyPart = parts.slice(1).join('\r\n\r\n');
-                
-                const headers = {};
-                headersPart.split('\r\n').forEach(line => {
+            // PHP peut envoyer des headers avec \r\n\r\n ou \n\n
+            let headersPart = '';
+            let bodyPart = output;
+            
+            const doubleNewlineIndex = output.indexOf('\r\n\r\n');
+            if (doubleNewlineIndex !== -1) {
+                headersPart = output.substring(0, doubleNewlineIndex);
+                bodyPart = output.substring(doubleNewlineIndex + 4);
+            } else {
+                const doubleNewlineIndex2 = output.indexOf('\n\n');
+                if (doubleNewlineIndex2 !== -1) {
+                    headersPart = output.substring(0, doubleNewlineIndex2);
+                    bodyPart = output.substring(doubleNewlineIndex2 + 2);
+                }
+            }
+            
+            const headers = { 'Content-Type': 'text/html; charset=utf-8' };
+            
+            if (headersPart) {
+                headersPart.split(/\r?\n/).forEach(line => {
                     const colonIndex = line.indexOf(':');
                     if (colonIndex > 0) {
                         const key = line.substring(0, colonIndex).trim();
                         const value = line.substring(colonIndex + 1).trim();
-                        headers[key] = value;
+                        if (key.toLowerCase() === 'content-type') {
+                            headers['Content-Type'] = value;
+                        } else if (key.toLowerCase() === 'location') {
+                            headers['Location'] = value;
+                            res.writeHead(302, headers);
+                            res.end();
+                            return;
+                        } else if (key.toLowerCase().startsWith('set-cookie')) {
+                            // Gérer les cookies
+                            if (!res.getHeader('Set-Cookie')) {
+                                res.setHeader('Set-Cookie', []);
+                            }
+                            const cookies = res.getHeader('Set-Cookie') || [];
+                            cookies.push(value);
+                            res.setHeader('Set-Cookie', cookies);
+                        } else {
+                            headers[key] = value;
+                        }
                     }
                 });
-
-                res.writeHead(200, headers);
-                res.end(bodyPart);
-            } else {
-                // Pas de headers, juste le body
-                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                res.end(output);
             }
+
+            res.writeHead(200, headers);
+            res.end(bodyPart);
         });
 
-        // Envoyer le body POST à PHP via stdin si nécessaire
-        if (body && req.method === 'POST') {
+        // Envoyer le body POST/PUT à PHP via stdin si nécessaire
+        if (body && (req.method === 'POST' || req.method === 'PUT')) {
             phpProcess.stdin.write(body);
+            phpProcess.stdin.end();
+        } else {
             phpProcess.stdin.end();
         }
     });
