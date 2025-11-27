@@ -400,9 +400,17 @@ wss.on('connection', (ws, req) => {
     });
 });
 
+// Vérifier si la base de données existe, sinon l'initialiser
+const dbPath = path.join(__dirname, 'database.db');
+if (!fs.existsSync(dbPath)) {
+    console.log('⚠️  Base de données non trouvée. Exécutez: npm run init-db');
+    console.log('💡 Ou la base de données sera créée automatiquement au premier accès PHP');
+}
+
 server.listen(PORT, () => {
     console.log(`✅ Serveur complet démarré sur le port ${PORT}`);
     console.log(`📄 Fichiers PHP: http://localhost:${PORT}/`);
     console.log(`🔌 WebSocket: ws://localhost:${PORT}/ws`);
     console.log(`📦 Fichiers statiques: http://localhost:${PORT}/[fichier]`);
+    console.log(`💾 Base de données: ${dbPath}`);
 });

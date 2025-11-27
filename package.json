@@ -4,6 +4,7 @@
   "main": "home.js",
   "scripts": {
     "start": "node server.js",
+    "init-db": "node init-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "sqlite3": "^5.1.6"
   }
 }

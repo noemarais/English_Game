@@ -22,8 +22,10 @@ npm install
 
 #### Build (Build Command)
 ```bash
-# Laissez vide
+npm install && npm run init-db
 ```
+
+**Note** : L'initialisation de la base de données se fait automatiquement lors du build.
 
 #### Run (Start Command)
 ```bash
@@ -74,11 +76,29 @@ Dans Coolify, vous pouvez spécifier une image Docker personnalisée qui contien
 
 ---
 
+## Initialisation de la base de données
+
+### Première utilisation
+
+Avant de démarrer l'application, initialisez la base de données SQLite :
+
+```bash
+npm run init-db
+```
+
+Ou dans Coolify, ajoutez dans **Build Command** :
+```bash
+npm install && npm run init-db
+```
+
+La base de données sera créée dans `database.db` (fichier local).
+
 ## Fonctionnalités
 
 - ✅ **Fichiers PHP** : Exécutés automatiquement via PHP CLI
 - ✅ **Fichiers statiques** : CSS, JS, images servis directement
 - ✅ **WebSockets** : Disponibles sur `/ws`
+- ✅ **Base de données SQLite** : Fichier local `database.db`, pas besoin de MySQL !
 - ✅ **Tout automatique** : Un seul service, tout fonctionne !
 
 ### Configuration recommandée

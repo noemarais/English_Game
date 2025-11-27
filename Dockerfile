@@ -1,11 +1,11 @@
 FROM node:18
 
-# Installer PHP et les extensions nécessaires
+# Installer PHP et les extensions nécessaires (SQLite au lieu de MySQL)
 RUN apt-get update && \
     apt-get install -y \
     php \
     php-cli \
-    php-mysql \
+    php-sqlite3 \
     php-mbstring \
     php-xml \
     php-curl \
