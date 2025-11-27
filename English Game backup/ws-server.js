@@ -2,7 +2,7 @@
 const WebSocket = require('ws');
 const url = require('url');
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3025;
 
 // gameId -> Set<ws>
 const games = new Map();
