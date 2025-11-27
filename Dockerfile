@@ -6,6 +6,7 @@ RUN apt-get update && \
     php \
     php-cli \
     php-sqlite3 \
+    php-pdo-sqlite \
     php-mbstring \
     php-xml \
     php-curl \

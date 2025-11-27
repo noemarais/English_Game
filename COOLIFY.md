@@ -22,10 +22,12 @@ npm install
 
 #### Build (Build Command)
 ```bash
-npm install && npm run init-db
+apt-get update && apt-get install -y php-sqlite3 php-pdo-sqlite && npm install
 ```
 
-**Note** : L'initialisation de la base de données se fait automatiquement lors du build.
+**Note** : 
+- L'extension SQLite est installée automatiquement
+- La base de données sera créée automatiquement au premier accès PHP
 
 #### Run (Start Command)
 ```bash
