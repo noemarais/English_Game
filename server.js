@@ -63,27 +63,43 @@ const BROADCAST_TYPES = new Set([
 function serveStaticFile(req, res, filePath) {
     const ext = path.extname(filePath).toLowerCase();
     const contentTypes = {
-        '.html': 'text/html',
-        '.css': 'text/css',
-        '.js': 'application/javascript',
-        '.json': 'application/json',
+        '.html': 'text/html; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
+        '.js': 'application/javascript; charset=utf-8',
+        '.json': 'application/json; charset=utf-8',
         '.png': 'image/png',
         '.jpg': 'image/jpeg',
         '.jpeg': 'image/jpeg',
         '.gif': 'image/gif',
         '.svg': 'image/svg+xml',
-        '.ico': 'image/x-icon'
+        '.ico': 'image/x-icon',
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2',
+        '.ttf': 'font/ttf',
+        '.eot': 'application/vnd.ms-fontobject'
     };
 
     fs.readFile(filePath, (err, data) => {
         if (err) {
+            console.error(`❌ Erreur lecture fichier ${filePath}:`, err.message);
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('404 Not Found');
             return;
         }
 
         const contentType = contentTypes[ext] || 'application/octet-stream';
-        res.writeHead(200, { 'Content-Type': contentType });
+        const headers = {
+            'Content-Type': contentType,
+            'Cache-Control': 'public, max-age=3600',
+            'Access-Control-Allow-Origin': '*'
+        };
+        
+        // Log pour déboguer les fichiers CSS
+        if (ext === '.css') {
+            console.log(`✅ CSS servi: ${filePath} (${data.length} bytes)`);
+        }
+        
+        res.writeHead(200, headers);
         res.end(data);
     });
 }
@@ -270,6 +286,11 @@ const server = http.createServer((req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const pathname = parsedUrl.pathname;
 
+    // Log des requêtes (sauf pour les fichiers statiques fréquents)
+    if (!pathname.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i)) {
+        console.log(`📥 ${req.method} ${pathname}`);
+    }
+
     // Route WebSocket - sera gérée par le serveur WebSocket
     if (pathname === '/ws') {
         // Le serveur WebSocket gérera cette route
@@ -281,22 +302,43 @@ const server = http.createServer((req, res) => {
     if (pathname === '/') {
         filePath = path.join(__dirname, 'home.php');
     } else {
-        filePath = path.join(__dirname, pathname);
+        // Nettoyer le chemin pour éviter les attaques de traversal
+        const cleanPath = pathname.split('?')[0]; // Enlever les query strings
+        filePath = path.join(__dirname, cleanPath);
+        
+        // Sécurité: s'assurer que le fichier est dans le répertoire de base
+        const resolvedPath = path.resolve(filePath);
+        const basePath = path.resolve(__dirname);
+        if (!resolvedPath.startsWith(basePath)) {
+            res.writeHead(403, { 'Content-Type': 'text/plain' });
+            res.end('403 Forbidden');
+            return;
+        }
     }
 
     // Vérifier si le fichier existe
     fs.stat(filePath, (err, stats) => {
-        if (err || !stats.isFile()) {
+        if (err) {
+            console.error(`❌ Fichier non trouvé: ${filePath}`, err.message);
             res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end('404 Not Found');
+            res.end('404 Not Found: ' + pathname);
+            return;
+        }
+        
+        if (!stats.isFile()) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('404 Not Found: Not a file');
             return;
         }
 
+        // Déterminer le type de fichier
+        const ext = path.extname(filePath).toLowerCase();
+        
         // Si c'est un fichier PHP, l'exécuter
-        if (filePath.endsWith('.php')) {
+        if (ext === '.php') {
             executePHP(req, res, filePath);
         } else {
-            // Sinon, servir comme fichier statique
+            // Sinon, servir comme fichier statique (CSS, JS, images, etc.)
             serveStaticFile(req, res, filePath);
         }
     });
