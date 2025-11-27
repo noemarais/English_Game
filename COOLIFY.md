@@ -4,8 +4,9 @@
 
 Le serveur gère **automatiquement** :
 - ✅ Fichiers PHP (exécutés via PHP CLI)
-- ✅ Fichiers statiques (CSS, JS, images)
+- ✅ Fichiers statiques (CSS, JS, images) - **PRIORITÉ**
 - ✅ WebSockets sur `/ws`
+- ✅ Base de données SQLite (fichier local `database.db`)
 
 **Un seul service Node.js suffit !**
 
@@ -22,12 +23,8 @@ npm install
 
 #### Build (Build Command)
 ```bash
-apt-get update && apt-get install -y php-sqlite3 php-pdo-sqlite && npm install
+apt-get update && apt-get install -y php php-cli php-sqlite3 php-pdo-sqlite php-mbstring php-xml php-curl && npm install
 ```
-
-**Note** : 
-- L'extension SQLite est installée automatiquement
-- La base de données sera créée automatiquement au premier accès PHP
 
 #### Run (Start Command)
 ```bash
@@ -35,89 +32,63 @@ npm start
 ```
 
 #### Variables d'environnement
-- `PORT`: Port pour le serveur (Coolify définit automatiquement cette variable, généralement 3025)
+- `PORT`: Port pour le serveur (Coolify définit automatiquement, généralement 3025)
 - `PHP_PATH`: (Optionnel) Chemin vers PHP si ce n'est pas dans le PATH. Par défaut: `php`
-
-**Note** : Assurez-vous que PHP est installé dans le conteneur Coolify. Si ce n'est pas le cas, ajoutez PHP dans les dépendances ou utilisez une image Docker avec PHP.
 
 ---
 
 ## Installation de PHP dans Coolify
-
-### ⚠️ IMPORTANT : PHP doit être installé
-
-Si vous voyez l'erreur `spawn php ENOENT`, PHP n'est pas installé dans votre conteneur.
 
 ### Option 1 : Utiliser le Dockerfile (RECOMMANDÉ)
 
 Un `Dockerfile` est fourni qui installe automatiquement PHP et Node.js.
 
 Dans Coolify :
-1. Allez dans les paramètres de votre service
-2. **Type de build** : Sélectionnez "Dockerfile"
-3. Le Dockerfile sera détecté automatiquement
-4. Redéployez votre service
+- **Type de build** : Dockerfile
+- Le Dockerfile sera utilisé automatiquement
 
 ### Option 2 : Installer PHP via Build Command
 
-Si vous n'utilisez pas le Dockerfile, dans Coolify :
-
-1. Allez dans les paramètres de votre service
-2. Dans **Build Command**, remplacez par :
-```bash
-apt-get update && apt-get install -y php php-cli php-mysql php-mbstring php-xml php-curl && npm install
-```
+Si vous n'utilisez pas le Dockerfile, utilisez la commande Build Command ci-dessus.
 
 **Important** : Assurez-vous que votre image de base supporte `apt-get` (images basées sur Debian/Ubuntu).
-
-### Option 3 : Utiliser une image Docker personnalisée
-
-Dans Coolify, vous pouvez spécifier une image Docker personnalisée qui contient déjà PHP et Node.js, par exemple :
-- `php:8.1-cli` + installation de Node.js
-- Ou une image personnalisée que vous créez
 
 ---
 
 ## Initialisation de la base de données
 
-### Première utilisation
+La base de données SQLite sera **créée automatiquement** au premier accès à une page PHP.
 
-Avant de démarrer l'application, initialisez la base de données SQLite :
-
+Si vous voulez l'initialiser manuellement :
 ```bash
 npm run init-db
 ```
 
-Ou dans Coolify, ajoutez dans **Build Command** :
-```bash
-npm install && npm run init-db
-```
+Ou accédez à `http://votre-url/init-db.php` dans votre navigateur.
 
-La base de données sera créée dans `database.db` (fichier local).
+---
 
 ## Fonctionnalités
 
 - ✅ **Fichiers PHP** : Exécutés automatiquement via PHP CLI
-- ✅ **Fichiers statiques** : CSS, JS, images servis directement
+- ✅ **Fichiers statiques** : CSS, JS, images servis en PRIORITÉ (avant les PHP)
 - ✅ **WebSockets** : Disponibles sur `/ws`
 - ✅ **Base de données SQLite** : Fichier local `database.db`, pas besoin de MySQL !
 - ✅ **Tout automatique** : Un seul service, tout fonctionne !
 
-### Configuration recommandée
-
-- **Point d'entrée principal** : Service PHP
-- **Route spéciale `/ws`** : Service Node.js
-
-Cela garantit que :
-- Les fichiers PHP sont exécutés par PHP-FPM
-- Les fichiers statiques sont servis par Nginx/Apache
-- Les WebSockets sont gérés par Node.js
-
 ---
 
-## Notes importantes
+## Dépannage
 
-- Le serveur WebSocket écoute sur `/ws` (pas besoin de spécifier le port dans l'URL)
-- Les fichiers PHP doivent être servis par un serveur PHP (Apache/Nginx avec PHP-FPM)
-- La base de données MySQL doit être configurée dans `db.php`
-- Le nouveau `server.js` remplace `ws-server.js` et gère à la fois HTTP et WebSocket
+### Le CSS ne charge pas
+- Vérifiez que les fichiers CSS existent dans le répertoire
+- Vérifiez les logs du serveur pour voir les requêtes
+- Les fichiers CSS sont servis en priorité avant les PHP
+
+### Erreur "could not find driver"
+- Assurez-vous que `php-sqlite3` et `php-pdo-sqlite` sont installés
+- Vérifiez la commande Build Command
+
+### Erreur "PHP n'est pas installé"
+- Vérifiez que PHP est installé dans le conteneur
+- Utilisez le Dockerfile ou la commande Build Command complète
